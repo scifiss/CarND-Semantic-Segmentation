@@ -4,7 +4,7 @@ import helper
 import warnings
 from distutils.version import LooseVersion
 import project_tests as tests
-from tqdm import tqdm
+
 import matplotlib.pyplot as plt
 import sys
 
@@ -21,7 +21,7 @@ else:
 
 
 
-r_learning = 1e-5
+r_learning = 1e-4
 BATCH_SIZE = 16
 p_keep = 0.5
 def load_vgg(sess, vgg_path):
@@ -50,7 +50,7 @@ def load_vgg(sess, vgg_path):
     
     
     return w1, keep, w3, w4, w7
-#tests.test_load_vgg(load_vgg, tf)
+tests.test_load_vgg(load_vgg, tf)
 
 
 def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
@@ -64,8 +64,8 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     """
     # TODO: Implement function
     # one by one convolution:  layer 7 conv 1x1
-    rand_std = 1e-3
-    l2_scale = 1e-5
+    rand_std = 1e-2
+    l2_scale = 1e-3
     conv1x1_l7 = tf.layers.conv2d(vgg_layer7_out,num_classes, 1, 1, padding='same',
                                 kernel_initializer=tf.truncated_normal_initializer(0,rand_std),
                                 kernel_regularizer=tf.contrib.layers.l2_regularizer(l2_scale))
@@ -98,7 +98,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
                                         kernel_regularizer=tf.contrib.layers.l2_regularizer(l2_scale))
     
     return output
-#tests.test_layers(layers)
+tests.test_layers(layers)
 
 
 def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
@@ -116,7 +116,7 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits( labels = labels,logits=logits))
     train_op = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy_loss)
     return logits, train_op, cross_entropy_loss
-#tests.test_optimize(optimize)
+tests.test_optimize(optimize)
 
 
 def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image,
@@ -151,25 +151,25 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
             nsample.append(i*batch_size)
             nloss.append(loss)  
         print("Epoch: %d Loss: %f"%(epoch,loss))
-    plt.plot(nsample,nloss, 'ro')
-    plt.savefig('runs/Bsize%d_Pkeep%f.jpg'%(batch_size, p_keep))
+    #plt.plot(nsample,nloss, 'ro')
+    #plt.savefig('runs/Bsize%d_Pkeep%f.jpg'%(batch_size, p_keep))
     with open ('runs/Bsize%d_Pkeep%f.txt'%(batch_size, p_keep),'w') as f:  
         for s,l in zip(nsample,nloss):
             f.write("%d   %f\n"%(s,l))
     
     
-#tests.test_train_nn(train_nn)
+tests.test_train_nn(train_nn)
 
  
 def run():
-    global p_keep,r_learning
+    global p_keep,r_learning,BATCH_SIZE
     num_classes = 2
     image_shape = (160, 576)
     data_dir = './data'
     runs_dir = './runs'
 
-    Epochs = 20
-    BATCH_SIZE = 16
+    Epochs = 30
+    #BATCH_SIZE = 16
     if len(sys.argv)>1:
         BATCH_SIZE = int(sys.argv[1])
     if len(sys.argv)>2:
@@ -216,7 +216,7 @@ def run():
 
         # TODO: Save inference data using helper.save_inference_samples
         #  helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
-        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, p_keep, input_image)
+        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
         # OPTIONAL: Apply the trained model to a video
 
 
