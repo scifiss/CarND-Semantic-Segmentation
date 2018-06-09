@@ -20,9 +20,10 @@ else:
 
 
 
-P_KEEP = 0.5;
-r_learning = 1e-5;
-BATCH_SIZE = 16;
+
+r_learning = 1e-5
+BATCH_SIZE = 16
+p_keep = 0.5
 def load_vgg(sess, vgg_path):
     """
     Load Pretrained VGG Model into TensorFlow.
@@ -49,7 +50,7 @@ def load_vgg(sess, vgg_path):
     
     
     return w1, keep, w3, w4, w7
-tests.test_load_vgg(load_vgg, tf)
+#tests.test_load_vgg(load_vgg, tf)
 
 
 def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
@@ -97,7 +98,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
                                         kernel_regularizer=tf.contrib.layers.l2_regularizer(l2_scale))
     
     return output
-tests.test_layers(layers)
+#tests.test_layers(layers)
 
 
 def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
@@ -115,7 +116,7 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits( labels = labels,logits=logits))
     train_op = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy_loss)
     return logits, train_op, cross_entropy_loss
-tests.test_optimize(optimize)
+#tests.test_optimize(optimize)
 
 
 def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image,
@@ -157,19 +158,22 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
             f.write("%d   %f\n"%(s,l))
     
     
-tests.test_train_nn(train_nn)
+#tests.test_train_nn(train_nn)
 
  
 def run():
+    global p_keep,r_learning
     num_classes = 2
     image_shape = (160, 576)
     data_dir = './data'
     runs_dir = './runs'
 
     Epochs = 20
+    BATCH_SIZE = 16
     if len(sys.argv)>1:
         BATCH_SIZE = int(sys.argv[1])
-        
+    if len(sys.argv)>2:
+            p_keep = float(sys.argv[2])    
     tests.test_for_kitti_dataset(data_dir)
 
     # Download pretrained vgg model
@@ -191,12 +195,13 @@ def run():
 
         # TODO: Build NN using load_vgg, layers, and optimize function
         input_image, keep_prob, layer3_out, layer4_out,layer7_out = load_vgg(sess, vgg_path)
-        p_keep = keep_prob
-        if len(sys.argv)>2:
-            p_keep = float(sys.argv[2])
+        tf.Print(keep_prob,[keep_prob])
+        #p_keep = keep_prob.get_Variable()
         
         
-        print("keep_prob from VGG: %f  keep_prob in project: %f"%(keep_prob,p_keep))
+        
+        
+        #print("keep_prob from VGG: %f  keep_prob in project: %f"%(keep_prob,p_keep))
         final_out = layers(layer3_out, layer4_out,layer7_out, num_classes)
         correct_label = tf.placeholder( tf.float32,  (None, None, None, num_classes))
         learning_rate = tf.placeholder( tf.float32)
@@ -204,7 +209,8 @@ def run():
 
         # TODO: Train NN using the train_nn function
         sess.run(tf.global_variables_initializer())
-        train_nn(sess, Epochs, BATCH_SIZE, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label, p_keep, r_learning)
+        train_nn(sess, Epochs, BATCH_SIZE, get_batches_fn, train_op, cross_entropy_loss, 
+                 input_image, correct_label, keep_prob, learning_rate)
         saver = tf.train.Saver()
         saver.save(sess, "./runs/Batch%d_Pkeep%f.ckpt"%( BATCH_SIZE, p_keep))
 
