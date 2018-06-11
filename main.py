@@ -4,9 +4,10 @@ import helper
 import warnings
 from distutils.version import LooseVersion
 import project_tests as tests
-
+from tqdm import tqdm
 import matplotlib.pyplot as plt
 import sys
+
 
 # Check TensorFlow Version
 assert LooseVersion(tf.__version__) >= LooseVersion('1.0'), 'Please use TensorFlow version 1.0 or newer.  You are using {}'.format(tf.__version__)
@@ -69,7 +70,9 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     conv1x1_l7 = tf.layers.conv2d(vgg_layer7_out,num_classes, 1, 1, padding='same',
                                 kernel_initializer=tf.truncated_normal_initializer(0,rand_std),
                                 kernel_regularizer=tf.contrib.layers.l2_regularizer(l2_scale))
-    
+    # do this according to https://discussions.udacity.com/t/here-is-some-advice-and-clarifications-about-the-semantic-segmentation-project/403100
+#    vgg_layer3_out = tf.multiply(vgg_layer3_out, 0.0001)
+#    vgg_layer4_out = tf.multiply(vgg_layer4_out, 0.01)
     conv1x1_l4 = tf.layers.conv2d(vgg_layer4_out,num_classes, 1, 1, padding='same',
                                 kernel_initializer=tf.truncated_normal_initializer(0,rand_std),
                                 kernel_regularizer=tf.contrib.layers.l2_regularizer(l2_scale))
@@ -114,6 +117,7 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     logits = tf.reshape(nn_last_layer, (-1, num_classes))
     labels = tf.reshape(correct_label, (-1, num_classes))
     cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits( labels = labels,logits=logits))
+#    total_loss = cross_entropy_loss+ sum(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
     train_op = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy_loss)
     return logits, train_op, cross_entropy_loss
 tests.test_optimize(optimize)
@@ -199,8 +203,6 @@ def run():
         #p_keep = keep_prob.get_Variable()
         
         
-        
-        
         #print("keep_prob from VGG: %f  keep_prob in project: %f"%(keep_prob,p_keep))
         final_out = layers(layer3_out, layer4_out,layer7_out, num_classes)
         correct_label = tf.placeholder( tf.float32,  (None, None, None, num_classes))
@@ -218,6 +220,9 @@ def run():
         #  helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
         helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
         # OPTIONAL: Apply the trained model to a video
+        video_name = 'dataroad_marked.mp4'
+        helper.gen_test_output_video(  data_dir, sess, image_shape, logits, keep_prob, input_image,video_name)
+        print('Writing video Finished.')
 
 
 if __name__ == '__main__':
