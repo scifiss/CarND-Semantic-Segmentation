@@ -41,20 +41,22 @@ Then total loss is calculated to include regularization loss, but this won't imp
     cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits( labels = labels,logits=logits))
     total_loss = cross_entropy_loss+ sum(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
 ```
-No regu loss | With regu loss
--------------|----------------|
-![picture alt](report/converging slowly with total loss
+
+![picture alt](report/LossAndConvergement.png)
+
 ### Augment images
-I tried several methods to generate augmented images (line 102~129).
+I tried several methods to generate augmented images (line 102~129). With augmented images, the system converges much faster.
 1) flip the images (between left and right)
 
 But I don't like this idea, since the cars drive on the right normally.
 
 2) change the brightness
+
 A random value is set for gamma, and exposure.adjust_gamma is applied.
 This should work very fine as a suplement to the training samples.
 
 3) geometric detortion 
+
 Rotation, shear, and translation are applied in one step with random parameters.
 
 ## 2. Neural Network Training results
