@@ -45,10 +45,12 @@ Then total loss is calculated to include regularization loss, but this won't imp
 ![picture alt](report/LossAndConvergement.png)
 
 ### Augment images
-I tried several methods to generate augmented images (line 102~129). With augmented images, the system converges much faster.
+I tried several methods to generate augmented images (line 102~129). With augmented images, the system converges much faster, but runs much slower...
 1) flip the images (between left and right)
 
 But I don't like this idea, since the cars drive on the right normally.
+
+![picture alt](report/flipimage.png)
 
 2) change the brightness
 
@@ -66,6 +68,6 @@ I have tried epoch numbers from 5~30, and find at least 20 epochs are needed.
 I tried batch size 16~32, and find 32 won't improve the results.
 The labeling for the test images are mostly correct. Please see the movie.
 
-
+I have spent tons of hours trying to generate the video. The order of the images shown in the video seems shuffled. Maybe VideoFileClip should be used.
 
  
