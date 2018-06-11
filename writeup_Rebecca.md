@@ -64,8 +64,10 @@ Rotation, shear, and translation are applied in one step with random parameters.
 ## 2. Neural Network Training results
 The model decreases loss over time generally.
 
-I have tried epoch numbers from 5~30, and find at least 20 epochs are needed.
-I tried batch size 16~32, and find 32 won't improve the results.
+![picture alt](report/loss.png)
+
+I have tried epoch numbers from 5-30, and find at least 20 epochs are needed.
+I tried batch size 16-32, and find 32 won't improve the results.
 The labeling for the test images are mostly correct. Please see the movie.
 
 I have spent tons of hours trying to generate the video. The order of the images shown in the video seems shuffled. Maybe VideoFileClip should be used.
