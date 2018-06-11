@@ -24,19 +24,19 @@ The code implement load_vgg, layers, optimize, and train_nn in the main.py. The 
 Truncated normal initializers are used to init the kernel weights, and L2 regularizers are used to regularize the kernels. 
 
 Note:
-According to the project tips, The outputs of pooling layers 3 and 4 should be scaled before they are fed into the 1x1 convolutions. . I add them and found it really deteriate the results, making the loss getting higher instead of lower. (line 73~75, main.cpp) So it was not involved in my layer definition.
+According to the project tips, The outputs of pooling layers 3 and 4 should be scaled before they are fed into the 1x1 convolutions. . 
 ```
    
     vgg_layer3_out = tf.multiply(vgg_layer3_out, 0.0001)
     vgg_layer4_out = tf.multiply(vgg_layer4_out, 0.01)
 ```
 
-![picture alt](report/BadResultsFromScaling.png)
+![picture alt](report/FasterConvergingFromScaling.png)
 
 ### Optimize implementation
 Firstly cross entropy loss is calculated and the learning rate is obtained through tf.train.AdamOptimizer.
 
-Then total loss is calculated to include regularization loss, but this won't improve the convergement.
+Then total loss is calculated to include regularization loss, but this won't improve the convergement evidently.
 ```
     cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits( labels = labels,logits=logits))
     total_loss = cross_entropy_loss+ sum(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
@@ -71,5 +71,5 @@ I tried batch size 16-32, and find 32 won't improve the results.
 The labeling for the test images are mostly correct. Please see the movie.
 
 I have spent tons of hours trying to generate the video. The order of the images shown in the video seems shuffled. Maybe VideoFileClip should be used.
-
+https://youtu.be/jZxR8n44IlM
  
