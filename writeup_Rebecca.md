@@ -68,8 +68,12 @@ The model decreases loss over time generally.
 
 I have tried epoch numbers from 5-30, and find at least 20 epochs are needed.
 I tried batch size 16-32, and find 32 won't improve the results.
-The labeling for the test images are mostly correct. Please see the movie.
+The labeling for the test images are mostly correct. 
 
-I have spent tons of hours trying to generate the video. The order of the images shown in the video seems shuffled. Maybe VideoFileClip should be used.
+![picture alt](report/um_000010.png)    ![picture alt](report/um_000015.png)
+![picture alt](report/um_000032.png)    ![picture alt](report/umm_000058.png)
+![picture alt](report/umm_000085.png)    ![picture alt](report/uu_000069.png)
+
+Please see the movie. The order of the images shown in the video seems shuffled. Maybe VideoFileClip should be used.
 https://youtu.be/jZxR8n44IlM
  
